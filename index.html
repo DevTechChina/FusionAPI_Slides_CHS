@@ -682,15 +682,7 @@ BOOL APIENTRY DllMain(HMODULE hmodule, DWORD reason, LPVOID reserved)
 					<li>定义事件函数</li>	
 					<li>添加函数指针到对应事件</li>		 
 					</ul> 		
-					 </section>
-					 <section id="fragments-event">	
-					 <h2>事件(Python) </h2> 
-					<pre><code data-trim contenteditable>
-  
-					</code></pre>	
-					
-					</section>
-					  
+					 </section> 
 					   <section id="fragments-event">	
 					 <h2>事件(JavaScript) </h2> 
 					 <pre><code data-trim contenteditable>
@@ -713,7 +705,13 @@ BOOL APIENTRY DllMain(HMODULE hmodule, DWORD reason, LPVOID reserved)
 					</code></pre>	
 					
 					  </section>
-					  
+					 <section id="fragments-event">	
+					 <h2>事件(Python) </h2> 
+					<pre><code data-trim contenteditable>
+  
+					</code></pre>	
+					
+					</section> 
 					   <section id="fragments-event">	
 					 <h2>事件(C++) </h2> 
 					 	 <pre><code data-trim contenteditable>
@@ -727,32 +725,116 @@ BOOL APIENTRY DllMain(HMODULE hmodule, DWORD reason, LPVOID reserved)
 					<section id="fragments-ui">	
 						<h2>命令和用户界面</h2>	
 					<ul>
-					<li>命令</li>
-					<ul>
-					<li>Definition: 定义Command名，事件，图标…</li>	
-					<li>userInterface.commandDefinitions: definition 集合</li>
-					<li>各种类型按钮添加方法，例如commandDefinitions.addButtonDefinition</li>
-					<li>定义命令执行事件</li>
-
-					<li>Controls: 关联Definition的UI界面</li>	 
-					<li>userInterface.workspaces: Model, Render, CAM...</li>
-					<li>workspace.toolbarPanels: workspace下的所有面板</li>
-					<li>panel.controls: 面板下的命令</li>
-					<li>controls.addCommand: 将definition添加到该面板</li>
-					</ul> 	
-					<li></li>
+						<li>命令</li>
+							<ul>
+							<li>Definition: 定义Command名，事件，图标…</li>	
+							 
+								<li>userInterface.commandDefinitions: definition 集合</li>
+								<li>各种类型按钮添加方法，例如commandDefinitions.addButtonDefinition</li>
+								<li>定义命令执行事件</li>
+							 </ul>
+						<li>Controls: 关联Definition的UI界面</li>	 
+							<ul>
+								<li>userInterface.workspaces: Model, Render, CAM...</li>
+								<li>workspace.toolbarPanels: workspace下的所有面板</li>
+								<li>panel.controls: 面板下的命令</li>
+								<li>controls.addCommand: 将definition添加到该面板</li>
+							</ul> 
+						 
 					</ul> 		
 					 </section>
 					 <section id="fragments-ui">	
-					 <h2>事件(Python) </h2> 
+					 <h2>命令和用户界面(Python) </h2> 
 					<pre><code data-trim contenteditable>
-  
+import adsk.core, adsk.fusion, traceback
+
+app = None
+ui = None
+handlers_dialog = []
+commandDefId = 'ADNTestCommandDef'
+commandName = 'My Test'
+commandDescription = 'test'
+workspaceToUse = "FusionSolidEnvironment"
+panelToUse = "SolidCreatePanel" 
+
+class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
+    def __init__(self):
+        super().__init__()
+    def notify(self, args):
+        global ui
+        ui.messageBox('我的按钮执行了！')
+        
+def run(context):
+   
+    try:
+        global app
+        app = adsk.core.Application.get()
+        global ui
+        ui = app.userInterface
+        
+        ui.messageBox('Hello addin')
+        
+        #添加命令的definition
+        cmdDef = ui.commandDefinitions.itemById(commandDefId)
+        if not cmdDef:
+            cmdDef = ui.commandDefinitions.addButtonDefinition(commandDefId, commandName, commandDescription, '/')
+            
+        onCommandCreated = CommandCreatedHandler()
+        cmdDef.commandCreated.add(onCommandCreated)
+        
+        #工作空间
+        workspaces_ = ui.workspaces
+        modelingWorkspace_ = workspaces_.itemById(workspaceToUse)
+        # 面板
+       
+        toolbarPanels_ = modelingWorkspace_.toolbarPanels
+        toolbarPanel_ = toolbarPanels_.itemById(panelToUse)
+        
+        #面板按钮集合
+        toolbarControlsPanel_ = toolbarPanel_.controls
+        toolbarControlPanel_ = toolbarControlsPanel_.itemById(commandDefId)
+        if not toolbarControlPanel_:
+            toolbarControlPanel_ = toolbarControlsPanel_.addCommand(cmdDef, commandDefId)
+
+        
+        #handlers_dialog.append(onCommandCreated)        
+
+    except:
+        if ui:
+            ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
+
+def stop(context):
+    ui = None
+    try:
+        app = adsk.core.Application.get()
+        ui  = app.userInterface
+        ui.messageBox('Stop addin')
+        
+        workspaces_ = ui.workspaces
+        modelingWorkspace_ = workspaces_.itemById(workspaceToUse)
+        toolbarPanels_ = modelingWorkspace_.toolbarPanels
+        toolbarPanel_ = toolbarPanels_.itemById(panelToUse)
+        toolbarControls_ = toolbarPanel_.controls
+        toolbarControl_ = toolbarControls_.itemById(commandDefId)
+        
+        if toolbarControl_.isValid:
+            toolbarControl_.deleteMe()
+        commandDefinitions_ = ui.commandDefinitions
+        commandDefinition_ = commandDefinitions_.itemById(commandDefId)
+         
+        if commandDefinition_.isValid:
+            commandDefinition_.deleteMe()
+
+    except:
+        if ui:
+            ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
+ 
 					</code></pre>	
 					
 					</section>
 					  
-					   <section id="fragments-event">	
-					 <h2>事件(JavaScript) </h2> 
+					   <section id="fragments-ui">	
+					 <h2>命令和用户界面(JavaScript) </h2> 
 					 <pre><code data-trim contenteditable>
 
 
@@ -760,8 +842,8 @@ BOOL APIENTRY DllMain(HMODULE hmodule, DWORD reason, LPVOID reserved)
 					
 					  </section>
 					  
-					   <section id="fragments-event">	
-					 <h2>事件(C++) </h2> 
+					   <section id="fragments-ui">	
+					 <h2>命令和用户界面(C++) </h2> 
 					 	 <pre><code data-trim contenteditable>
  
 					</code></pre>	
