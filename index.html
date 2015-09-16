@@ -840,6 +840,135 @@ def stop(context):
 					   <section id="fragments-ui">	
 					 <h2>命令和用户界面(JavaScript) </h2> 
 					 <pre><code data-trim contenteditable>
+//Author-
+//Description-
+
+
+
+var commandId = 'ADNTestJSCommandDef';
+var commandName = 'My Javascript Test';
+var commandDescription = 'test';
+var workspaceToUse = 'FusionSolidEnvironment';
+var panelToUse = 'SolidCreatePanel';
+var commandResources = './';
+
+
+
+//插件启动时自动调用的入口
+//初始化自定义界面，增加自定义按钮
+function run(context) {
+
+    //是否支持调试
+    "use strict";
+    if (adsk.debug === true) {
+        /*jslint debug: true*/
+        debugger;
+        /*jslint debug: false*/
+    }
+
+    var ui;
+    try {
+        var app = adsk.core.Application.get();
+        ui = app.userInterface;
+        
+       
+        
+        
+        //创建按钮命令
+        var onCommandCreated = function(args) {
+            try {
+                // 委托按钮执行事件.
+                var command = args.command;
+                command.execute.add(onCommandExecuted); 
+                
+            } 
+            catch (e) {
+                ui.messageBox('创建命令失败 : ' + errorDescription(e));
+            }
+        };
+
+        // 按钮执行事件
+        var onCommandExecuted = function(args) {
+            try {
+                
+                 ui.messageBox("Javascript创建的按钮被执行！");
+                
+            } 
+            catch (e) {        
+                ui.messageBox('执行按钮失败！ : ' + errorDescription(e));
+            }
+        }; 
+        
+         // 添加按钮
+        var workspaces_ = ui.workspaces;
+        //【模型】工作空间
+        var modelingWorkspace_ = workspaces_.itemById('FusionSolidEnvironment');
+        var toolbarPanels_ = modelingWorkspace_.toolbarPanels;
+        //工作空间某面板
+        var toolbarPanel_ = toolbarPanels_.itemById(panelToUse)          
+        var toolbarControls_ = toolbarPanel_.controls;
+        var toolbarControl_ = toolbarControls_.itemById(commandId);
+        if (toolbarControl_) {
+            //若已经创建
+            adsk.terminate();
+            return;
+        } else {
+            //命令定义
+            var commandDefinition_ = ui.commandDefinitions.itemById(commandId);
+            if (!commandDefinition_) {
+                commandDefinition_ = ui.commandDefinitions.addButtonDefinition(commandId, commandName, commandDescription, commandResources);
+            }
+            //委托命令创建事件
+            commandDefinition_.commandCreated.add(onCommandCreated);
+            //添加定义到面板
+            toolbarControl_ = toolbarControls_.addCommand(commandDefinition_);
+            toolbarControl_.isVisible = true; 
+        }
+    }
+    catch (e) {
+        if (ui) {
+            ui.messageBox('Failed : ' + (e.description ? e.description : e));
+        }
+    }
+}
+
+
+//插件卸载时自动调用
+//销毁自定义界面，释放其它对象 
+function stop(context) {
+    var ui;
+    try {
+            var app = adsk.core.Application.get();
+            ui = app.userInterface;
+            
+        
+            //删除按钮
+            var workspaces_ = ui.workspaces;
+            var modelingWorkspace_ = workspaces_.itemById('FusionSolidEnvironment');
+            var toolbarPanels_ = modelingWorkspace_.toolbarPanels;
+            var toolbarPanel_ = toolbarPanels_.itemById(panelToUse)          
+            var toolbarControls_ = toolbarPanel_.controls;
+            var toolbarControl_ = toolbarControls_.itemById(commandId);
+        
+            if (toolbarControl_.isValid) {
+                toolbarControl_.deleteMe();
+            }  
+        
+            //删除命令定义
+            var commandDefinitions_ = ui.commandDefinitions;
+            var commandDefinition_ = commandDefinitions_.itemById(commandId);
+
+            if (commandDefinition_.isValid) {
+                commandDefinition_.deleteMe();
+            }  
+        
+    }
+    catch (e) {
+        if (ui) {
+            ui.messageBox('Failed : ' + (e.description ? e.description : e));
+        }
+    }
+}
 
 
 					</code></pre>	
