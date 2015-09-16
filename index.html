@@ -607,11 +607,11 @@ def stop(context):
 				  
 				   <section id="fragments-addin-structure">
 				  <h2>插件基本结构(C++)</h2>
- <pre><code data-trim contenteditable>
+				  
+<pre><code data-trim contenteditable>
  
 #include <Core/CoreAll.h>
 #include <Fusion/FusionAll.h>
-
 
 using namespace adsk::core;
 using namespace adsk::fusion;
@@ -756,13 +756,17 @@ commandDescription = 'test'
 workspaceToUse = "FusionSolidEnvironment"
 panelToUse = "SolidCreatePanel" 
 
+#执行按钮的事件
 class CommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
     def __init__(self):
         super().__init__()
     def notify(self, args):
         global ui
         ui.messageBox('我的按钮执行了！')
-        
+ 
+ 
+#插件启动时自动调用的入口
+#初始化自定义界面，增加自定义按钮
 def run(context):
    
     try:
@@ -771,44 +775,45 @@ def run(context):
         global ui
         ui = app.userInterface
         
-        ui.messageBox('Hello addin')
-        
         #添加命令的definition
         cmdDef = ui.commandDefinitions.itemById(commandDefId)
         if not cmdDef:
             cmdDef = ui.commandDefinitions.addButtonDefinition(commandDefId, commandName, commandDescription, '/')
-            
+        
+        #委托按钮的执行事件    
         onCommandCreated = CommandCreatedHandler()
         cmdDef.commandCreated.add(onCommandCreated)
         
-        #工作空间
+        #获得【模型】工作空间
         workspaces_ = ui.workspaces
         modelingWorkspace_ = workspaces_.itemById(workspaceToUse)
-        # 面板
-       
+        
+        # 获得【创建】的面板
         toolbarPanels_ = modelingWorkspace_.toolbarPanels
         toolbarPanel_ = toolbarPanels_.itemById(panelToUse)
         
-        #面板按钮集合
+        #添加新按钮到面板按钮集合
         toolbarControlsPanel_ = toolbarPanel_.controls
         toolbarControlPanel_ = toolbarControlsPanel_.itemById(commandDefId)
         if not toolbarControlPanel_:
             toolbarControlPanel_ = toolbarControlsPanel_.addCommand(cmdDef, commandDefId)
-
         
-        #handlers_dialog.append(onCommandCreated)        
+        #附加到全局句柄
+        handlers_dialog.append(onCommandCreated)        
 
     except:
         if ui:
             ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
 
+#插件卸载时自动调用
+#销毁自定义界面，释放其它对象 
 def stop(context):
     ui = None
     try:
         app = adsk.core.Application.get()
-        ui  = app.userInterface
-        ui.messageBox('Stop addin')
+        ui  = app.userInterface 
         
+        #删除按钮
         workspaces_ = ui.workspaces
         modelingWorkspace_ = workspaces_.itemById(workspaceToUse)
         toolbarPanels_ = modelingWorkspace_.toolbarPanels
