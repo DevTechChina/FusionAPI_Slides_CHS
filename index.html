@@ -572,7 +572,39 @@ var ext = extrudes.add(extInput)
 						<section id="fragments-create-extrude-js">										 					 
 						<h2>创建拉伸特征（JavaScript）</h2>	
 						 <pre><code data-trim contenteditable>
+       //获取application
+        var app = adsk.core.Application.get();
+        ui = app.userInterface;
+        //当前设计
+        var product = app.activeProduct;
+        var design = adsk.fusion.Design(product);
 
+        // 获取当前设计的模型根对象rootComponent. 
+        var rootComp = design.rootComponent;
+        
+        //基于XZ平面创建草图
+        var sketches = rootComp.sketches;
+        var sketch = sketches.add(rootComp.xZConstructionPlane);
+        
+        //绘制一个草图圆. 
+        var sketchCircles = sketch.sketchCurves.sketchCircles;
+        var centerPoint = adsk.core.Point3D.create(0, 0, 0);
+        var circle = sketchCircles.addByCenterRadius(centerPoint, 5.0);
+        
+        // 获取缺省的第一个轮廓（即这个草图圆区域） 
+        var prof = sketch.profiles.item(0);
+
+        // 创建模型特征的Input对象 
+        var extrudes = rootComp.features.extrudeFeatures;
+        var extInput = extrudes.createInput(prof, adsk.fusion.FeatureOperations.NewBodyFeatureOperation);
+        
+        // 定义特征的拉伸距离 
+        var distance = adsk.core.ValueInput.createByReal(5);
+        // Set the distance extent to be symmetric
+        extInput.setDistanceExtent(true, distance);      
+
+        //  利用该Input对象创建拉伸特征 
+        var ext = extrudes.add(extInput);
 
 						</code></pre>	
 					</section> 					
