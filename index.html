@@ -783,9 +783,8 @@ If (face1 == face2)
 				 <h2>练习</h2>
 				 <h3>选择某平面，基于平面创建草图，绘制矩形，根据此轮廓，创建一定长度的拉伸特征</h3>
 				 </section>
-				 
+				  
 				 <section>
-				
 				 <section id="fragments-addin-structure">
 				  <h2>插件基本结构(JavaScript)</h2>
  <pre><code data-trim contenteditable>
@@ -995,7 +994,7 @@ def run(context):
 	  //添加函数指针到对应事件
       ui.workspaceActivated.add(MyWorkspaceActivatedHandler); 
 	  //注意。即使是脚本形式，Javascript委托的事件仍旧在后台执行，
-	  //所以不需要Python或C++中的adsk::autoTerminate(false);
+	  //所以不需要Python或C++中的
       
   } 
 } 
@@ -1117,7 +1116,19 @@ BOOL APIENTRY DllMain(HMODULE hmodule, DWORD reason, LPVOID reserved)
 						 
 					</ul> 		
 					 </section>
-					 <section id="fragments-ui">	
+					 <section id="fragments-ui">
+						<h2>用户界面</h2>		
+						<ul>
+						<li>Definition: 定义Command名，事件，图标…</li>	
+						<li>Controls: 关联Definition的UI界面</li>		 
+						</ul> 
+									
+						<img width="700" height="500" data-src="images/ui.png" alt="Down arrow">							 
+					</section>		 
+				</section> 
+				
+				
+					 <section>	
 					 <h2>命令和用户界面(Python) </h2> 
 					<pre><code data-trim contenteditable>
 import adsk.core, adsk.fusion, traceback
@@ -1212,7 +1223,7 @@ def stop(context):
 					
 					</section>
 					  
-					   <section id="fragments-ui">	
+					   <section >	
 					 <h2>命令和用户界面(JavaScript) </h2> 
 					 <pre><code data-trim contenteditable>
 //Author-
@@ -1350,29 +1361,14 @@ function stop(context) {
 					
 					  </section>
 					  
-					   <section id="fragments-ui">	
+				 <section >	
 					 <h2>命令和用户界面(C++) </h2> 
 					 	 <pre><code data-trim contenteditable>
  
 					</code></pre>	
 					
 					  </section>
-				</section> 				
-				
-				 <section>
-					<h2>用户界面</h2>		
-					<ul>
-					<li>Definition: 定义Command名，事件，图标…</li>	
-					<li>Controls: 关联Definition的UI界面</li>		 
-					</ul> 
-					 			
-					<img width="700" height="500" data-src="images/ui.png" alt="Down arrow">	
-					 
-							 
-				</section> 
-				 
-			
-
+			 
 				
 				<section>
 					<section id="fragments-hackathon">	
